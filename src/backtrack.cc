@@ -24,10 +24,10 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 void Backtrack::recurBacktrack(const Graph& data, const Graph& query,
 	const CandidateSet& cs) {
 
-	if (Size_M = query.GetNumVertices()) {
+	if (Size_M == query.GetNumVertices()) {
 		std::cout << "t " << query.GetNumVertices() << "\n";
 	}
-	else if (Size_M = 0) {
+	else if (Size_M == 0) {
 		size_t r = 0;//root ID for query DAG
 
 		float argmin = (cs.GetCandidateSize(0) / query.GetDegree(0)), argtemp;
@@ -39,6 +39,8 @@ void Backtrack::recurBacktrack(const Graph& data, const Graph& query,
 				argmin = argtemp;
 			}
 		}
+
+		query.MarkVisited(r, true);
 
 		for (size_t i = 0, v; i < cs.GetCandidateSize(r); i++) {
 
