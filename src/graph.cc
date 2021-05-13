@@ -60,6 +60,7 @@ Graph::Graph(const std::string &filename, bool is_query) {
   // Load Graph
   std::ifstream fin(filename);
   std::set<Label> label_set;
+  
 
   if (!fin.is_open()) {
     std::cout << "Graph file " << filename << " not found!\n";
@@ -74,6 +75,7 @@ Graph::Graph(const std::string &filename, bool is_query) {
 
   start_offset_.resize(num_vertices_ + 1);
   label_.resize(num_vertices_);
+  visited_.assign(num_vertices_,false);//added
 
   num_edges_ = 0;
 

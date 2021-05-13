@@ -7,6 +7,7 @@
 #define GRAPH_H_
 
 #include "common.h"
+#include <graph.h>
 
 class Graph {
  public:
@@ -17,6 +18,8 @@ class Graph {
 
   inline size_t GetNumVertices() const;
   inline size_t GetNumEdges() const;
+  inline bool IsVisited(Vertex v) const;//added
+  inline void MarkVisited(Vertex v, bool visited) const;//added
   inline size_t GetNumLabels() const;
 
   inline size_t GetLabelFrequency(Label l) const;
@@ -41,6 +44,7 @@ class Graph {
   size_t num_vertices_;
   size_t num_edges_;
   size_t num_labels_;
+  std::vector<bool> visited_;//added
 
   std::vector<size_t> label_frequency_;
 
@@ -66,6 +70,24 @@ inline int32_t Graph::GetGraphID() const { return graph_id_; }
  * @return size_t
  */
 inline size_t Graph::GetNumVertices() const { return num_vertices_; }
+
+ /**
+  * @brief Returns whether vertex v is visited or not. If v is visited,
+  * return true, else, return false.
+  *
+  * @param v vertex id.
+  * @return bool
+  */
+inline bool Graph::IsVisited(Vertex v) const { return visited_[v]; }//added
+
+ /**
+  * @brief Mark whether vertex v is visited or not.
+  *
+  * @param v vertex id.
+  * @return void
+  */
+inline void Graph::MarkVisited(Vertex v,bool visited) const { visited_[v] = visited; }//added
+
 /**
  * @brief Returns the number of edges |E| of the graph.
  *
