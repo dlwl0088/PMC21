@@ -4,62 +4,109 @@
  */
 
 #include "backtrack.h"
+#include "heap.h"
 
 Backtrack::Backtrack() {}
 Backtrack::~Backtrack() {}
 
 void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 	const CandidateSet& cs) {
-	std::cout << "t " << query.GetNumVertices() << "\n";
 
-	// implement your code here.
+	size_t Nq = query.GetNumVertices();
+	std::cout << "t " << Nq << "\n";
 
-	//Store embedding
-	M.assign(query.GetNumVertices(), -1);
-	Size_M = 0;
+	bool* mark = new bool[Nq]();
+	Vertex* embd = new Vertex[Nq]();
 
-}
+	Vertex* state=new Vertex[Nq];
+	size_t lenM = 0;
 
+	size_t* csPos = new size_t[Nq]();
 
-void Backtrack::recurBacktrack(const Graph& data, const Graph& query,
-	const CandidateSet& cs) {
+	Vertex u = 0;
 
-	if (Size_M == query.GetNumVertices()) {
-		std::cout << "t " << query.GetNumVertices() << "\n";
+	size_t* csSize = new size_t[Nq]();
+	for (size_t i = 0; i < Nq; i++) csSize[i] = cs.GetCandidateSize(i);
+	
+	Heap extVtx(Nq, csSize);
+
+	double argmin = (cs.GetCandidateSize(0) / query.GetDegree(0)), argtemp;
+
+	for (size_t i = 1; i < Nq; i++) {
+		argtemp = (cs.GetCandidateSize(i) / query.GetDegree(i));
+		if (argtemp < argmin) {
+			u = i;
+			argmin = argtemp;
+		}
 	}
-	else if (Size_M == 0) {
-		size_t r = 0;//root ID for query DAG
 
-		float argmin = (cs.GetCandidateSize(0) / query.GetDegree(0)), argtemp;
+	state[lenM++] = u;
+	mark[u] = true;
+	extVtx.insert(u);
 
-		for (size_t i = 1; i < query.GetNumVertices(); i++) {
-			argtemp = (cs.GetCandidateSize(i) / query.GetDegree(i));
-			if (argtemp < argmin) {
-				r = i;
-				argmin = argtemp;
+	bool call = true;
+	while (lenM > 0) {
+		bool matched = false;
+		if (lenM == Nq) {
+			std::cout << "a" ;
+			for (int i = 0; i < Nq; i++)std::cout<<" "<<embd[i];
+			std::cout << "\n";
+			call = false;
+		
+		}
+		else {
+			u = call ? extVtx.remove() : state[lenM - 1];
+
+			size_t j = csPos[u];
+			Vertex un, v;
+			while (j < cs.GetCandidateSize(u)) {
+				bool Extendable = true;
+				v = cs.GetCandidate(u, j);
+				for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
+					un = query.GetNeighbor(k);
+					if (mark[un] && !(data.IsNeighbor(embd[un], v))) {
+						Extendable = false;
+						break;
+					}
+				}
+
+				if (Extendable) {
+					embd[u] = v;
+					csPos[u] = j + 1;
+					state[lenM++] = u;
+					matched = true;
+					mark[u] = true;
+
+					for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
+						un = query.GetNeighbor(k);
+						if (!mark[un]) extVtx.insert(un);
+					}
+					break;
+				}
+				j++;
 			}
 		}
 
-		query.MarkVisited(r, true);
 
-		for (size_t i = 0, v; i < cs.GetCandidateSize(r); i++) {
 
-			v = cs.GetCandidate(r, i);
-			M[r] = v;
-			Size_M=1;
-			data.MarkVisited(v, true);
+		if (!matched) {
 
-			recurBacktrack(data, query, cs);
-			data.MarkVisited(v, false);
-
+			call = false;
+			lenM--;
+			extVtx.insert(u);
+			csPos[u] = 0;
+			mark[u] = false;
 		}
 
-
 	}
-	else {
 
 
-	}
-	return;
+
+
+
+	delete[] mark;
+	delete[] embd;
+	delete[] state;
+	delete[] csSize;
+	delete[] csPos;
 }
-
