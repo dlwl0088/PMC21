@@ -15,21 +15,24 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 	size_t Nq = query.GetNumVertices();
 	std::cout << "t " << Nq << "\n";
 
-	bool* mark = new bool[Nq]();
+	bool* mark = new bool[Nq](); // Mark whether vertices of query is visited or not
+
 	Vertex* embd = new Vertex[Nq]();
+	size_t len = 0; // length of current partial embedding
 
-	Vertex* state=new Vertex[Nq];
-	size_t lenM = 0;
+	Vertex* state = new Vertex[Nq]; // Store recurrence state 
 
-	size_t* csPos = new size_t[Nq]();
 
-	Vertex u = 0;
+	size_t* csPos = new size_t[Nq](); // the current position in the candidate set of each vertex
 
-	size_t* csSize = new size_t[Nq]();
-	for (size_t i = 0; i < Nq; i++) csSize[i] = cs.GetCandidateSize(i);
-	
-	Heap extVtx(Nq, csSize);
+	size_t* measure = new size_t[Nq](); // the measure for selecting extendable vertices
+	for (size_t i = 0; i < Nq; i++) measure[i] = cs.GetCandidateSize(i);
 
+	Heap extVtx(Nq, measure); // Store extendable vertices
+
+	Vertex u = 0; // current vertex in the query
+
+	// Selecting root vertex
 	double argmin = (cs.GetCandidateSize(0) / query.GetDegree(0)), argtemp;
 
 	for (size_t i = 1; i < Nq; i++) {
@@ -40,41 +43,41 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 		}
 	}
 
-	state[lenM++] = u;
-	mark[u] = true;
+	state[len++] = u;
 	extVtx.insert(u);
 
-	bool call = true;
-	while (lenM > 0) {
-		bool matched = false;
-		if (lenM == Nq) {
-			std::cout << "a" ;
-			for (int i = 0; i < Nq; i++)std::cout<<" "<<embd[i];
+	bool call = true;//Store whether the function is examining new vertex or backtracking
+	while (len > 0) {
+		if (len == Nq) {
+			std::cout << "a";
+			for (int i = 0; i < Nq; i++)std::cout << " " << embd[i];
 			std::cout << "\n";
+
 			call = false;
-		
 		}
 		else {
-			u = call ? extVtx.remove() : state[lenM - 1];
+			u = call ? extVtx.remove() : state[len - 1];
 
-			size_t j = csPos[u];
 			Vertex un, v;
-			while (j < cs.GetCandidateSize(u)) {
-				bool Extendable = true;
+
+			bool embedded_u = false;
+			for (size_t j = csPos[u]; j < cs.GetCandidateSize(u); j++) {
 				v = cs.GetCandidate(u, j);
+
+				bool embedded_v = true;
 				for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
 					un = query.GetNeighbor(k);
 					if (mark[un] && !(data.IsNeighbor(embd[un], v))) {
-						Extendable = false;
+						embedded_v = false;
 						break;
 					}
 				}
 
-				if (Extendable) {
+				if (embedded_v) {
 					embd[u] = v;
 					csPos[u] = j + 1;
-					state[lenM++] = u;
-					matched = true;
+					state[len++] = u;
+					embedded_u = true;
 					mark[u] = true;
 
 					for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
@@ -83,30 +86,20 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 					}
 					break;
 				}
-				j++;
+			}
+			if (!embedded_u) { // backtracking
+				call = false;
+				len--;
+				extVtx.insert(u);
+				csPos[u] = 0;
+				mark[u] = false;
 			}
 		}
-
-
-
-		if (!matched) {
-
-			call = false;
-			lenM--;
-			extVtx.insert(u);
-			csPos[u] = 0;
-			mark[u] = false;
-		}
-
 	}
-
-
-
-
 
 	delete[] mark;
 	delete[] embd;
 	delete[] state;
-	delete[] csSize;
+	delete[] measure;
 	delete[] csPos;
 }
