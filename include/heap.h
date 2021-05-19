@@ -60,7 +60,7 @@ inline size_t Heap::parent(size_t pos) const  // Return parent position
 }
 inline void Heap::buildHeap()           // Heapify contents of Heap
 {
-	for (size_t i = n / 2 - 1; i >= 0; i--) siftdown(i);
+	for (size_t i = n / 2 - 1; (int)i >= 0; i--) siftdown(i);
 }
 inline void Heap::swap(size_t a, size_t b) { size_t temp = heap[a]; heap[a] = heap[b]; heap[b] = temp; }
 
