@@ -60,13 +60,19 @@ inline size_t Heap::parent(size_t pos) const  // Return parent position
 }
 inline void Heap::buildHeap()           // Heapify contents of Heap
 {
-	for (size_t i = n / 2 - 1; (int)i >= 0; i--) siftdown(i);
+	if (n < 2) return;
+	size_t i = (n / 2) - 1;
+	while (true) {
+		siftdown(i);
+		if (i == 0) break;
+		i--;
+	}
 }
 inline void Heap::swap(size_t a, size_t b) { size_t temp = heap[a]; heap[a] = heap[b]; heap[b] = temp; }
 
 // Insert "it" into the heap
 inline void Heap::insert(const size_t& it) {
-	assert(n < maxsize, "Heap is full");
+	assert(n < maxsize);
 	size_t curr = n++;
 	heap[curr] = it;            // Start at end of heap
 	// Now sift up until curr's parent < curr
@@ -78,7 +84,7 @@ inline void Heap::insert(const size_t& it) {
 }
 // Remove first value
 inline size_t Heap::remove() {
-	assert(n > 0, "Heap is empty");
+	assert(n > 0);
 	swap(0, --n);       // Swap first with last value
 	if (n != 0) siftdown(0);  // Siftdown new root val
 	return heap[n];             // Return deleted value
