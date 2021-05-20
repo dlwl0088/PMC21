@@ -45,13 +45,17 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 		}
 	}
 
-	state[len++] = u;
+	for (size_t i = 0; i < Nq; i++) embd[i] = -1;
+
+	state[len] = u;
 	bool fi = true;
+	size_t iter;
 	extVtx.insert(u);
 	inserted[u] = true;
 
 	bool call = true;//Store whether the function is examining new vertex or backtracking
-	while (len > 0) {
+	while (len > 0 || fi) {
+		fi = false;
 		if (len == Nq) {
 			std::cout << "a";
 			for (size_t i = 0; i < Nq; i++) std::cout << " " << embd[i];
@@ -62,7 +66,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 
 		u = call ? extVtx.remove() : state[len--];
 		if (call) inserted[u] = false;
-		//std::cout << (int)u << "\n";
+		//std::cout << call << (int)len << (int)u << "\n";
 
 		Vertex un, v;
 
@@ -70,6 +74,11 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 		for (size_t j = csPos[u]; j < cs.GetCandidateSize(u); j++) {
 			v = cs.GetCandidate(u, j);
 			//std::cout << (int)v << "\n";
+
+			for(iter = 0; iter < Nq; iter++) {
+				if(iter != u && mark[iter] && embd[iter] == v) break;
+			}
+			if (iter != Nq) continue;
 
 			bool embedded_v = true;
 			//std::cout << query.GetNeighborStartOffset(u) << "\n";
@@ -87,8 +96,6 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 				embd[u] = v;
 				csPos[u] = j + 1;
 				state[len++] = u;
-				if (fi) len--;
-				fi = false;
 				embedded_u = true;
 				mark[u] = true;
 
@@ -104,7 +111,6 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 		}
 		if (!embedded_u) { // backtracking
 			call = false;
-			len--;
 			if (!inserted[u]) {
 				extVtx.insert(u);
 				inserted[u] = true;
@@ -113,6 +119,8 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 			mark[u] = false;
 		}
 	}
+
+	delete[] inserted;
 
 	delete[] mark;
 	delete[] embd;
