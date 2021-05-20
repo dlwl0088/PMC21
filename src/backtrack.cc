@@ -5,9 +5,6 @@
 
 #include "backtrack.h"
 #include "heap.h"
-#include "checker.h"
-#include <fstream>
-#include <iostream>
 
 Backtrack::Backtrack() {}
 Backtrack::~Backtrack() {}
