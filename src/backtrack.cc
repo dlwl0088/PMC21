@@ -90,8 +90,6 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 	if (!embedded_u) return;
 
 	while (len > 0) {
-		for (size_t j = 0; j < len; j++) std::cout << state[j] << " ";
-		std::cout << "\n";
 		if (len == Nq) {
 			std::cout << "a";
 			for (size_t i = 0; i < Nq; i++)
