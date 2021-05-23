@@ -5,21 +5,18 @@
 
 #include "backtrack.h"
 #include "heap.h"
+#include "checker.h"
 
 Backtrack::Backtrack() {}
 Backtrack::~Backtrack() {}
 
 void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 	const CandidateSet& cs) {
-	//std::string path = "res.igraph";
-	//std::ofstream fp;
-	//fp.open(path);
 
 	size_t Nq = query.GetNumVertices();
 	size_t Nd = data.GetNumVertices();
 
 	std::cout << "t " << Nq << "\n";
-	//fp << "t " << Nq;
 
 	bool* mark = new bool[Nq](); // Mark whether vertices of query is visited or not
 	bool* inserted = new bool[Nq](); // Avoid inserting overlapping vertices into heap
@@ -40,6 +37,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 	Heap extVtx(Nq, measure); // Store extendable vertices
 
 	Vertex u = 0; // current vertex in the query
+	Vertex un, v;
 
 	// Selecting root vertex
 	double argmin = (cs.GetCandidateSize(0) / query.GetDegree(0)), argtemp;
@@ -54,54 +52,95 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 
 	for (size_t i = 0; i < Nq; i++) embd[i] = -1;
 
-	state[len] = u;
-	bool fi = true;
-	bool embedded_u, embedded_v;
-	extVtx.insert(u);
-	inserted[u] = true;
+	state[len++] = u;
 
-	bool call = true;//Store whether the function is examining new vertex or backtracking
-	while (len > 0 || fi) {
-		fi = false;
+	bool embedded_u, embedded_v;
+
+	bool call = true; //Store whether the function is examining new vertex or backtracking
+
+	embedded_u = false;
+	for (size_t j = csPos[u]; j < cs.GetCandidateSize(u); j++) {
+		v = cs.GetCandidate(u, j);
+
+		if (isembd[v]) continue;
+
+		embedded_v = true;
+		for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
+			un = query.GetNeighbor(k);
+			if (mark[un] && !(data.IsNeighbor(embd[un], v))) {
+				embedded_v = false;
+				break;
+			}
+		}
+
+		if (embedded_v) {
+			embd[u] = v;
+			isembd[v] = true;
+			csPos[u] = j + 1;
+			embedded_u = true;
+			mark[u] = true;
+
+			for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
+				un = query.GetNeighbor(k);
+				extVtx.insert(un);
+				inserted[un] = true;
+			}
+			break;
+		}
+	}
+	if (!embedded_u) return;
+
+	while (len > 0) {
+		for (size_t j = 0; j < len; j++) std::cout << state[j] << " ";
+		std::cout << "\n";
 		if (len == Nq) {
 			std::cout << "a";
-			//fp << "\n";
-			//fp << "a";
 			for (size_t i = 0; i < Nq; i++)
 			{
 				std::cout << " " << embd[i];
-				//fp << " " << embd[i];
 			}
 			std::cout << "\n";
 
-			call = false;
+			isembd[embd[u]] = false;
+			embd[u] = -1;
+			mark[u] = false;
+			len--;
 		}
 
-		u = call ? extVtx.remove() : state[len--];
-		if (call) inserted[u] = false;
-		//if (!call) std::cout << (int)state[len + 1] << "\n";
+		else {
+			if (call) {
+				u = extVtx.remove();
+				inserted[u] = false;
+			}
+			else {
+				if (embd[u] != -1) isembd[embd[u]] = false;
+				embd[u] = -1;
+				extVtx.insert(u);
+				inserted[u] = true;
 
-		//std::cout << call << " " << (int)len << " " << (int)u << "\n";
+				len--;
 
-		Vertex un, v;
+				u = state[len];
+				mark[u] = false;
+				isembd[embd[u]] = false;
+				embd[u] = -1;
+				//std::cout << u << " " << csPos[u] << " " << cs.GetCandidateSize(u) << std::endl;
+			}
+		}
+		//for (size_t j = 0; j < len; j++) std::cout << state[j] << " ";
+		//std::cout << "\n";
 
 		embedded_u = false;
 		for (size_t j = csPos[u]; j < cs.GetCandidateSize(u); j++) {
 			v = cs.GetCandidate(u, j);
-			//std::cout << (int)j << "/" << cs.GetCandidateSize(u) << ": ";
-			//std::cout << (int)v << "\n";
+			//std::cout << u << " " << csPos[u]<< " " << v << "\n";
+			//std::cout << v << std::endl;
 
 			if (isembd[v]) continue;
 
 			embedded_v = true;
-			//std::cout << query.GetNeighborStartOffset(u) << "\n";
-			//std::cout << query.GetNeighborEndOffset(u) << "\n";
 			for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
 				un = query.GetNeighbor(k);
-				//std::cout << k << " un: " << (int)un << "\n";
-				//std::cout << mark[un] << "\n";
-				//std::cout << embd[un] << "\n";
-				//if (mark[un]) std::cout << data.IsNeighbor(embd[un], v) << "\n";
 				if (mark[un] && !(data.IsNeighbor(embd[un], v))) {
 					embedded_v = false;
 					break;
@@ -115,6 +154,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 				state[len++] = u;
 				embedded_u = true;
 				mark[u] = true;
+				call = true;
 
 				for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
 					un = query.GetNeighbor(k);
@@ -128,13 +168,8 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 		}
 		if (!embedded_u) { // backtracking
 			call = false;
-			if (!inserted[u]) {
-				extVtx.insert(u);
-				inserted[u] = true;
-			}
 			csPos[u] = 0;
 			mark[u] = false;
-			isembd[embd[u]] = false;
 		}
 	}
 
@@ -146,6 +181,4 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 	delete[] state;
 	delete[] measure;
 	delete[] csPos;
-
-	//fp.close();
 }
