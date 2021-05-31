@@ -1,1 +1,16 @@
-(./main/program ../data/lcc_yeast.igraph ../query/lcc_yeast_n1.igraph ../cs/cs_yeast_n1.igraph; ./main/program ../data/lcc_yeast.igraph ../query/lcc_yeast_n3.igraph ../cs/cs_yeast_n3.igraph; ./main/program ../data/lcc_yeast.igraph ../query/lcc_yeast_n5.igraph ../cs/cs_yeast_n5.igraph; ./main/program ../data/lcc_yeast.igraph ../query/lcc_yeast_n8.igraph ../cs/cs_yeast_n8.igraph; ./main/program ../data/lcc_yeast.igraph ../query/lcc_yeast_s1.igraph ../cs/cs_yeast_s1.igraph; ./main/program ../data/lcc_yeast.igraph ../query/lcc_yeast_s3.igraph ../cs/cs_yeast_s3.igraph; ./main/program ../data/lcc_yeast.igraph ../query/lcc_yeast_s5.igraph ../cs/cs_yeast_s5.igraph; ./main/program ../data/lcc_yeast.igraph ../query/lcc_yeast_s8.igraph ../cs/cs_yeast_s8.igraph; ./main/program ../data/lcc_human.igraph ../query/lcc_human_n1.igraph ../cs/cs_human_n1.igraph; ./main/program ../data/lcc_human.igraph ../query/lcc_human_n3.igraph ../cs/cs_human_n3.igraph; ./main/program ../data/lcc_human.igraph ../query/lcc_human_n5.igraph ../cs/cs_human_n5.igraph; ./main/program ../data/lcc_human.igraph ../query/lcc_human_n8.igraph ../cs/cs_human_n8.igraph; ./main/program ../data/lcc_human.igraph ../query/lcc_human_s1.igraph ../cs/cs_human_s1.igraph; ./main/program ../data/lcc_human.igraph ../query/lcc_human_s3.igraph ../cs/cs_human_s3.igraph; ./main/program ../data/lcc_human.igraph ../query/lcc_human_s5.igraph ../cs/cs_human_s5.igraph; ./main/program ../data/lcc_human.igraph ../query/lcc_human_s8.igraph ../cs/cs_human_s8.igraph; ./main/program ../data/lcc_hprd.igraph ../query/lcc_hprd_n1.igraph ../cs/cs_hprd_n1.igraph; ./main/program ../data/lcc_hprd.igraph ../query/lcc_hprd_n3.igraph ../cs/cs_hprd_n3.igraph; ./main/program ../data/lcc_hprd.igraph ../query/lcc_hprd_n5.igraph ../cs/cs_hprd_n5.igraph; ./main/program ../data/lcc_hprd.igraph ../query/lcc_hprd_n8.igraph ../cs/cs_hprd_n8.igraph; ./main/program ../data/lcc_hprd.igraph ../query/lcc_hprd_s1.igraph ../cs/cs_hprd_s1.igraph; ./main/program ../data/lcc_hprd.igraph ../query/lcc_hprd_s3.igraph ../cs/cs_hprd_s3.igraph; ./main/program ../data/lcc_hprd.igraph ../query/lcc_hprd_s5.igraph ../cs/cs_hprd_s5.igraph; ./main/program ../data/lcc_hprd.igraph ../query/lcc_hprd_s8.igraph ../cs/cs_hprd_s8.igraph) >> result.txt
+#!/usr/bin bash
+
+for query in n1 n3 n5 n8 s1 s3 s5 s8
+do
+timeout 60 ./build/main/program ./data/lcc_yeast.igraph ./query/lcc_yeast_$query.igraph ./cs/cs_yeast_$query.igraph > ./embd/embd_yeast_$query.txt;
+done
+
+for query in n1 n3 n5 n8 s1 s3 s5 s8
+do
+timeout 60 ./build/main/program ./data/lcc_human.igraph ./query/lcc_human_$query.igraph ./cs/cs_human_$query.igraph > ./embd/embd_human_$query.txt;
+done
+
+for query in n1 n3 n5 n8 s1 s3 s5 s8
+do
+timeout 60 ./build/main/program ./data/lcc_hprd.igraph ./query/lcc_hprd_$query.igraph ./cs/cs_hprd_$query.igraph > ./embd/embd_hprd_$query.txt;
+done

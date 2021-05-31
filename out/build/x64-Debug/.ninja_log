@@ -1,0 +1,8 @@
+# ninja log v5
+32	618	6441498868338939	main/CMakeFiles/program.dir/__/src/heap.cc.obj	17b496da5cb8decc
+18	630	6441498868299050	main/CMakeFiles/program.dir/main.cc.obj	4023c230376d18fa
+8	660	6441498868777788	main/CMakeFiles/program.dir/__/src/graph.cc.obj	e6ccf81c3bc07538
+25	624	6441498868398781	main/CMakeFiles/program.dir/__/src/backtrack.cc.obj	5c12121f3e7d6c2
+0	12	0	clean	9992afb1f91dc381
+1	646	6441498868538407	main/CMakeFiles/program.dir/__/src/candidate_set.cc.obj	7bd2769576655f76
+661	909	6441498870543074	main/program.exe	a4f9a605dea6a406

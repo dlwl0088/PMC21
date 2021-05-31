@@ -1,8 +1,8 @@
-# Install script for directory: C:/Users/dlwl0088/source/repos/dlwl0088/PMC21/main
+# Install script for directory: C:/Users/dlwl0088/source/repos/PMC21/main
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/Users/dlwl0088/source/repos/dlwl0088/PMC21/out/install/x64-Debug")
+  set(CMAKE_INSTALL_PREFIX "C:/Users/dlwl0088/Source/Repos/PMC21/out/install/x64-Debug")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 

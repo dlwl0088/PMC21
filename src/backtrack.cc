@@ -81,6 +81,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 
 			for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
 				un = query.GetNeighbor(k);
+				measure[un] = cs.GetCandidateSize(un)-csPos[un];
 				extVtx.insert(un);
 				inserted[un] = true;
 			}
@@ -112,6 +113,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 			else {
 				if (embd[u] != -1) isembd[embd[u]] = false;
 				embd[u] = -1;
+				measure[u] = cs.GetCandidateSize(u)-csPos[u];
 				extVtx.insert(u);
 				inserted[u] = true;
 
@@ -156,6 +158,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 				for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
 					un = query.GetNeighbor(k);
 					if (!mark[un] && !inserted[un]) {
+						measure[un] = cs.GetCandidateSize(un) - csPos[un];
 						extVtx.insert(un);
 						inserted[un] = true;
 					}
