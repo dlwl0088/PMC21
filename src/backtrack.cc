@@ -22,8 +22,8 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 	std::vector<bool> mark(Nq, false); // Mark whether vertices of query is visited or not
 	std::vector<size_t> csPos(Nq); // the current position in the candidate set of each vertex
 
-	std::vector<size_t> extnum(Nq); // the measure for state
-	Heap state(Nq, extnum); // Store recurrence state
+	std::vector<Vertex> state(Nq); // Store recurrence state 
+	size_t len = 0; // length of current partial embedding
 
 	std::vector<size_t> measure(Nq); // the measure for selecting extendable vertices
 	Heap extVtx(Nq, measure); // Store extendable vertices
@@ -53,7 +53,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 	inserted[u] = true;
 
 	do {
-		if (state.size() == Nq) {
+		if (len == Nq) {
 			std::cout << "a";
 			for (size_t i = 0; i < Nq; i++)
 			{
@@ -68,7 +68,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 			inserted[u] = false;
 		}
 		else {
-			u = state.remove();
+			u = state[--len];
 			mark[u] = false;
 			isembd[embd[u]] = false;
 			embd[u] = -1;
@@ -106,18 +106,15 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 
 				for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
 					un = query.GetNeighbor(k);
-					if (!mark[un]) {
-						extnum[u]++;
-						if (!inserted[un]) {
+					if (!mark[un]&&!inserted[un]) {
 							measure[un] = cs.GetCandidateSize(un) - csPos[un];
 							extVtx.insert(un);
 							inserted[un] = true;
-						}
 
 					}
 				}
 
-				state.insert(u);
+				state[len++] = u;
 
 				embedded_u = true;
 				call = true;
@@ -135,5 +132,5 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 		extVtx.insert(u);
 		inserted[u] = true;
 
-	} while (state.size());
+	} while (len);
 }
