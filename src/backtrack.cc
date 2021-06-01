@@ -55,38 +55,20 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 
 	bool call = true; //Store whether the function is examining new vertex or backtracking
 
-	embedded_u = false;
-	for (size_t j = csPos[u]; j < cs.GetCandidateSize(u); j++) {
-		v = cs.GetCandidate(u, j);
+	v = cs.GetCandidate(u, 0);
+	embd[u] = v;
+	isembd[v] = true;
+	csPos[u] = 1;
+	mark[u] = true;
 
-		if (isembd[v]) continue;
-
-		embedded_v = true;
-		for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
-			un = query.GetNeighbor(k);
-			if (mark[un] && !(data.IsNeighbor(embd[un], v))) {
-				embedded_v = false;
-				break;
-			}
-		}
-
-		if (embedded_v) {
-			embd[u] = v;
-			isembd[v] = true;
-			csPos[u] = j + 1;
-			embedded_u = true;
-			mark[u] = true;
-
-			for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
-				un = query.GetNeighbor(k);
-				measure[un] = (cs.GetCandidateSize(un) - csPos[un]) ;
-				extVtx.insert(un);
-				inserted[un] = true;
-			}
-			break;
-		}
+	for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
+		un = query.GetNeighbor(k);
+		measure[un] = (cs.GetCandidateSize(un) - csPos[un]);
+		extVtx.insert(un);
+		inserted[un] = true;
 	}
-	if (!embedded_u) return;
+
+
 
 	while (len > 0) {
 		if (len == Nq) {
@@ -139,13 +121,25 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 			if (isembd[v]) continue;
 
 			embedded_v = true;
-			for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
-				un = query.GetNeighbor(k);
-				if (mark[un] && !(data.IsNeighbor(embd[un], v))) {
-					embedded_v = false;
-					break;
+
+			if (len < query.GetDegree(u)) {
+				for (size_t pos = 0; pos < len; pos++) {
+					if (!(data.IsNeighbor(embd[state[pos]], v))) {
+						embedded_v = false;
+						break;
+					}
 				}
 			}
+			else {
+				for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
+					un = query.GetNeighbor(k);
+					if (mark[un] && !(data.IsNeighbor(embd[un], v))) {
+						embedded_v = false;
+						break;
+					}
+				}
+			}
+
 
 			if (embedded_v) {
 				embd[u] = v;
@@ -159,7 +153,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 				for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
 					un = query.GetNeighbor(k);
 					if (!mark[un] && !inserted[un]) {
-						measure[un] = (cs.GetCandidateSize(un) - csPos[un]) ;
+						measure[un] = (cs.GetCandidateSize(un) - csPos[un]);
 						extVtx.insert(un);
 						inserted[un] = true;
 					}
