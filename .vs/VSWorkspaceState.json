@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\include",
+    "\\src"
   ],
-  "SelectedNode": "\\test.sh",
+  "SelectedNode": "\\src\\backtrack.cc",
   "PreviewInSolutionExplorer": false
 }

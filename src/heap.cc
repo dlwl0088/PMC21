@@ -5,8 +5,8 @@
 
 #include "heap.h"
 
-Heap::Heap(const size_t max, size_t* m) {
-    heap = new Vertex[max]();
+Heap::Heap(const size_t max, std::vector<size_t> m) {
+    heap.resize(max);
     measure = m;
     n = 0;
     maxsize = max;
@@ -14,5 +14,4 @@ Heap::Heap(const size_t max, size_t* m) {
 }
 
 Heap::~Heap() {
-    delete[] heap;
 }

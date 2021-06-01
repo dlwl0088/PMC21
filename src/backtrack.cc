@@ -17,21 +17,20 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 
 	std::cout << "t " << Nq << "\n";
 
-	bool* mark = new bool[Nq](); // Mark whether vertices of query is visited or not
-	bool* inserted = new bool[Nq](); // Avoid inserting overlapping vertices into heap
-	bool* isembd = new bool[Nd](); // Avoid inserting overlapping vertices into embd
+	std::vector<bool> mark(Nq, false); // Mark whether vertices of query is visited or not
+	std::vector<bool> inserted(Nq, false); // Avoid inserting overlapping vertices into heap
+	std::vector<bool> isembd(Nd, false); // Avoid inserting overlapping vertices into embd
 
-	Vertex* embd = new Vertex[Nq]();
+	std::vector<Vertex> embd(Nq, -1);
 	size_t len = 0; // length of current partial embedding
 
-	Vertex* state = new Vertex[Nq](); // Store recurrence state 
+	std::vector<Vertex> state(Nq); // Store recurrence state 
 
 
-	size_t* csPos = new size_t[Nq](); // the current position in the candidate set of each vertex
+	std::vector<size_t> csPos(Nq); // the current position in the candidate set of each vertex
 
-	size_t* measure = new size_t[Nq](); // the measure for selecting extendable vertices
+	std::vector<size_t> measure(Nq); // the measure for selecting extendable vertices
 
-	for (size_t i = 0; i < Nq; i++) measure[i] = cs.GetCandidateSize(i);
 
 	Heap extVtx(Nq, measure); // Store extendable vertices
 
@@ -39,17 +38,16 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 	Vertex un, v;
 
 	// Selecting root vertex
-	double argmin = (cs.GetCandidateSize(0) / query.GetDegree(0)), argtemp;
+	long double argmin = (cs.GetCandidateSize(0) / ((long double)query.GetDegree(0))), argtemp;
 
 	for (size_t i = 1; i < Nq; i++) {
-		argtemp = (cs.GetCandidateSize(i) / query.GetDegree(i));
+		argtemp = (cs.GetCandidateSize(i) / ((long double)query.GetDegree(i)));
 		if (argtemp < argmin) {
 			u = i;
 			argmin = argtemp;
 		}
 	}
 
-	for (size_t i = 0; i < Nq; i++) embd[i] = -1;
 
 	state[len++] = u;
 
@@ -81,7 +79,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 
 			for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
 				un = query.GetNeighbor(k);
-				measure[un] = cs.GetCandidateSize(un)-csPos[un];
+				measure[un] = (cs.GetCandidateSize(un) - csPos[un]) ;
 				extVtx.insert(un);
 				inserted[un] = true;
 			}
@@ -113,7 +111,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 			else {
 				if (embd[u] != -1) isembd[embd[u]] = false;
 				embd[u] = -1;
-				measure[u] = cs.GetCandidateSize(u)-csPos[u];
+				measure[u] = (cs.GetCandidateSize(u) - csPos[u]);
 				extVtx.insert(u);
 				inserted[u] = true;
 
@@ -130,6 +128,9 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 		//std::cout << "\n";
 
 		embedded_u = false;
+
+
+
 		for (size_t j = csPos[u]; j < cs.GetCandidateSize(u); j++) {
 			v = cs.GetCandidate(u, j);
 			//std::cout << u << " " << csPos[u]<< " " << v << "\n";
@@ -158,7 +159,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 				for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
 					un = query.GetNeighbor(k);
 					if (!mark[un] && !inserted[un]) {
-						measure[un] = cs.GetCandidateSize(un) - csPos[un];
+						measure[un] = (cs.GetCandidateSize(un) - csPos[un]) ;
 						extVtx.insert(un);
 						inserted[un] = true;
 					}
@@ -173,12 +174,4 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 		}
 	}
 
-	delete[] inserted;
-	delete[] isembd;
-
-	delete[] mark;
-	delete[] embd;
-	delete[] state;
-	delete[] measure;
-	delete[] csPos;
 }

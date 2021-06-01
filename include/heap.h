@@ -13,7 +13,7 @@
 
 class Heap {
 public:
-	explicit  Heap(const size_t max, size_t* m);     // Constructor
+	explicit  Heap(const size_t max, std::vector<size_t> m);     // Constructor
 	~Heap();
 
 	inline size_t size() const;
@@ -27,10 +27,10 @@ public:
 	inline size_t remove();
 
 private:
-	Vertex* heap;          // Pointer to the heap array
+	std::vector<Vertex> heap;          // Pointer to the heap array
 	size_t maxsize;         // Maximum size of the heap
 	size_t n;               // Number of elements now in the heap
-	size_t* measure;
+	std::vector<size_t> measure;
 
 	inline void siftdown(size_t pos);
 	// Helper function to put element in its correct place
@@ -93,9 +93,9 @@ inline size_t Heap::remove() {
 
 inline void Heap::siftdown(size_t pos) {
 	while (!isLeaf(pos)) { // Stop if pos is a leaf
-		size_t j = leftchild(pos);  size_t rc = rightchild(pos);
-		if ((rc < n) && (measure[heap[rc]] < measure[heap[j]]))
-			j = rc;            // Set j to smaller child's value
+		size_t j = leftchild(pos);  size_t RightChild = rightchild(pos);
+		if ((RightChild < n) && (measure[heap[RightChild]] < measure[heap[j]]))
+			j = RightChild;            // Set j to smaller child's value
 		if (heap[pos] < heap[j]) return; // Done
 		swap(pos, j);
 		pos = j;             // Move down
