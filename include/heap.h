@@ -74,7 +74,7 @@ inline void Heap::swap(size_t a, size_t b) {
 	idx[heap[a]] = b;
 	idx[heap[b]] = a;
 
-	size_t temp = heap[a];
+	Vertex temp = heap[a];
 	heap[a] = heap[b];
 	heap[b] = temp;
 
