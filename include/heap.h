@@ -24,7 +24,7 @@ public:
 	inline Vertex remove();
 	inline Vertex remove(size_t pos);
 	inline Vertex remove(Vertex it);
-	inline Vertex Heap::peek();
+	inline Vertex peek();
 
 private:
 	std::vector<Vertex> heap;          // Pointer to the heap array

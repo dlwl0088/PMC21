@@ -16,3 +16,11 @@
 1	749	6444044091220737	main/CMakeFiles/program.dir/__/src/backtrack.cc.obj	5c12121f3e7d6c2
 754	1026	6444044093210751	main/program.exe	a735ce1b9f7e0883
 0	16	0	clean	9992afb1f91dc381
+49	1116	6444156514384399	main/CMakeFiles/program.dir/__/src/stack.cc.obj	3b48a4405db922d2
+38	1122	6444156514404400	main/CMakeFiles/program.dir/__/src/heap.cc.obj	17b496da5cb8decc
+16	1138	6444156514474418	main/CMakeFiles/program.dir/main.cc.obj	4023c230376d18fa
+2	1139	6444156514544402	main/CMakeFiles/program.dir/__/src/candidate_set.cc.obj	7bd2769576655f76
+26	1155	6444156514794392	main/CMakeFiles/program.dir/__/src/backtrack.cc.obj	5c12121f3e7d6c2
+61	1160	6444156514844396	main/CMakeFiles/program.dir/__/src/graph.cc.obj	e6ccf81c3bc07538
+1160	1598	6444156517874965	main/program.exe	a735ce1b9f7e0883
+1	40	0	clean	9992afb1f91dc381
