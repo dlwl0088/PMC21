@@ -1,10 +1,13 @@
 {
   "ExpandedNodes": [
     "",
+    "\\cs",
+    "\\data",
     "\\include",
     "\\main",
+    "\\out",
+    "\\query",
     "\\src"
   ],
-  "SelectedNode": "\\src\\backtrack.cc",
   "PreviewInSolutionExplorer": false
 }
