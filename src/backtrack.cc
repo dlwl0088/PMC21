@@ -5,6 +5,7 @@
 
 #include "backtrack.h"
 #include "heap.h"
+#include "stack.h"
 
 Backtrack::Backtrack() {}
 Backtrack::~Backtrack() {}
@@ -12,31 +13,29 @@ Backtrack::~Backtrack() {}
 void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 	const CandidateSet& cs) {
 
-	size_t Nq = query.GetNumVertices();
-	size_t Nd = data.GetNumVertices();
+	size_t num_query = query.GetNumVertices(), num_data = data.GetNumVertices();
+	std::cout << "t " << num_query << "\n";
 
-	std::cout << "t " << Nq << "\n";
+	std::vector<Vertex> embedding(num_query, -1);
+	std::vector<bool> query_mapped(num_query, false), data_mapped(num_data, false), Is_extendableVertex(num_query, false);
+	Stack state(num_query); //Store recurrence state
 
-	std::vector<Vertex> embd(Nq, -1); //  Store partial embedding
-	std::vector<bool> isembd(Nd, false); // Avoid inserting overlapping vertices into embd	
-	std::vector<bool> mark(Nq, false); // Mark whether vertices of query is visited or not
-	std::vector<size_t> csPos(Nq); // the current position in the candidate set of each vertex
+	std::vector<size_t> measure(num_query), pivotCS(num_query), posCS(num_query), num_extendableNeighbor(num_query);
+	Heap extendableVertex(num_query, measure);
+	std::vector<std::vector<std::pair<Vertex, size_t>>> extendableCS(num_query);
+	for (Vertex w = 0; w < num_query; w++) {
+		extendableCS[w].resize(cs.GetCandidateSize(w));
+		for (size_t i = 0; i < cs.GetCandidateSize(w); i++) {
+			extendableCS[w][i] = std::pair<Vertex, size_t>(cs.GetCandidate(w, i), num_query + 1);
+		}
+	}
 
-	std::vector<Vertex> state(Nq); // Store recurrence state 
-	size_t len = 0; // length of current partial embedding
-
-	std::vector<size_t> measure(Nq); // the measure for selecting extendable vertices
-	Heap extVtx(Nq, measure); // Store extendable vertices
-	std::vector<bool> inserted(Nq, false); // Avoid inserting overlapping vertices into heap
-
-	Vertex u = 0; // current vertex in the query
-	Vertex un, v;
+	Vertex u = 0, un, v=-1;
+	std::pair< Vertex, size_t > temp;
 
 	// Selecting root vertex
-
 	long double argmin = cs.GetCandidateSize(0) / ((long double)query.GetDegree(0)), argtemp;
-
-	for (size_t i = 1; i < Nq; i++) {
+	for (size_t i = 1; i < num_query; i++) {
 		argtemp = cs.GetCandidateSize(i) / ((long double)query.GetDegree(i));
 		if (argtemp < argmin) {
 			u = i;
@@ -44,93 +43,128 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 		}
 	}
 
-	bool embedded_u, embedded_v;
+	measure[u] = cs.GetCandidateSize(u) * query.GetDegree(u);
+	extendableVertex.insert(u);
+	Is_extendableVertex[u] = true;
 
 	bool call = true; //Store whether the function is examining new vertex or backtracking
-
-	measure[u] = cs.GetCandidateSize(u);
-	extVtx.insert(u);
-	inserted[u] = true;
-
+	bool matches;
+	std::vector<size_t> stoppedNeighborOffset(num_query);
+		
 	do {
-		if (len == Nq) {
+		matches = true;
+		if (call) {
+			u = extendableVertex.remove();
+			posCS[u] = pivotCS[u];
+		}
+		else {
+			u = state.peek();
+			data_mapped[extendableCS[u][posCS[u]].first] = false;
+			for (size_t k = stoppedNeighborOffset[u]; k >= query.GetNeighborStartOffset(u); k--) {
+				un = query.GetNeighbor(k);
+
+				if (!query_mapped[un]) {
+					num_extendableNeighbor[un]--;
+
+					for (size_t it = pivotCS[un] - 1; extendableCS[un][it].second == state.size(); it--) {
+						if (!data.IsNeighbor(embedding[u], extendableCS[un][it].first)) {
+							extendableCS[un][it].second = num_query + 1;
+							pivotCS[un]--;
+						}
+					}
+
+					if (Is_extendableVertex[un]) {
+						extendableVertex.remove(un);
+					}
+					else {
+						Is_extendableVertex[un] = true;
+					}
+
+					measure[un] = (cs.GetCandidateSize(un) - pivotCS[un]) * num_extendableNeighbor[un];
+					extendableVertex.insert(un);
+				}
+			}
+			posCS[u]++;
+		}
+
+		while ((posCS[u] < cs.GetCandidateSize(u)) && data_mapped[v = extendableCS[u][posCS[u]].first]) posCS[u]++;
+		matches = (posCS[u] < cs.GetCandidateSize(u));
+
+		if (!matches) {
+			if (!call) {
+				state.pop();
+				query_mapped[u] = false;
+				data_mapped[embedding[u]] = false;
+				embedding[u] = -1;
+			}
+			extendableVertex.insert(u);
+			call = false;
+			continue;
+		}
+
+		stoppedNeighborOffset[u] = query.GetNeighborEndOffset(u);
+		for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
+			un = query.GetNeighbor(k);
+
+			if (!query_mapped[un]) {
+				num_extendableNeighbor[un]++;
+				for (size_t itr = pivotCS[un]; itr < cs.GetCandidateSize(un); itr++) {
+					if (!data.IsNeighbor(v, extendableCS[un][itr].first)) {
+						extendableCS[un][itr].second = state.size();
+
+						temp = extendableCS[un][itr];
+						extendableCS[un][itr] = extendableCS[un][pivotCS[un]];
+						extendableCS[un][pivotCS[un]] = temp;
+
+						pivotCS[un]++;
+					}
+				}
+
+				if (pivotCS[un] == cs.GetCandidateSize(un)) {
+					stoppedNeighborOffset[u] = k;
+					matches = false;
+					break;
+				}
+				else {
+					measure[un] = (cs.GetCandidateSize(un) - pivotCS[un]) * num_extendableNeighbor[un];
+
+					if (Is_extendableVertex[un]) {
+						extendableVertex.remove(un);
+					}
+					else {
+						Is_extendableVertex[un] = true;
+					}
+
+					extendableVertex.insert(un);
+				}
+			}
+		}
+
+		if (!matches) {
+			call = false;
+			continue;
+		}
+
+		embedding[u] = v;
+		data_mapped[v] = true;
+
+		if (call) {
+			query_mapped[u] = true;
+			state.push(u);
+			Is_extendableVertex[u] = false;
+		}
+
+		if (state.size() == num_query) {
 			std::cout << "a";
-			for (size_t i = 0; i < Nq; i++)
-			{
-				std::cout << " " << embd[i];
+			for (size_t i = 0; i < num_query; i++) {
+				std::cout << " " << embedding[i];
 			}
 			std::cout << "\n";
 			call = false;
 		}
-
-		if (call) {
-			u = extVtx.remove();
-			inserted[u] = false;
-		}
 		else {
-			u = state[--len];
-			mark[u] = false;
-			isembd[embd[u]] = false;
-			embd[u] = -1;
-			//std::cout << u << " " << csPos[u] << " " << cs.GetCandidateSize(u) << std::endl;
+		call = true;
 		}
 
-		//std::cout << "\n";
-
-		embedded_u = false;
-
-		for (size_t j = csPos[u]; j < cs.GetCandidateSize(u); j++) {
-			v = cs.GetCandidate(u, j);
-			//std::cout << u << " " << csPos[u]<< " " << v << "\n";
-			//std::cout << v << std::endl;
-
-			if (isembd[v]) continue;
-
-			embedded_v = true;
-
-
-			for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
-				un = query.GetNeighbor(k);
-				if (mark[un] && !(data.IsNeighbor(embd[un], v))) {
-					embedded_v = false;
-					break;
-				}
-			}
-
-
-			if (embedded_v) {
-				embd[u] = v;
-				isembd[v] = true;
-				csPos[u] = j + 1;
-				mark[u] = true;
-
-				for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
-					un = query.GetNeighbor(k);
-					if (!mark[un]&&!inserted[un]) {
-							measure[un] = cs.GetCandidateSize(un) - csPos[un];
-							extVtx.insert(un);
-							inserted[un] = true;
-
-					}
-				}
-
-				state[len++] = u;
-
-				embedded_u = true;
-				call = true;
-
-				break;
-			}
-		}
-		if (embedded_u) continue;
-
-		//backtrack
-		call = false;
-		csPos[u] = 0;
-
-		measure[u] = cs.GetCandidateSize(u);
-		extVtx.insert(u);
-		inserted[u] = true;
-
-	} while (len);
+	} while (state.size() > 0);
 }

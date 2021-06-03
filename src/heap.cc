@@ -10,6 +10,7 @@ Heap::Heap(const size_t max, std::vector<size_t> m) {
     measure = m;
     n = 0;
     maxsize = max;
+    idx.resize(max);
     Heap::buildHeap();
 }
 

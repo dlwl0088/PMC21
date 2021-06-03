@@ -111,6 +111,14 @@ build main\CMakeFiles\program.dir\__\src\heap.cc.obj: CXX_COMPILER__program_Debu
   TARGET_COMPILE_PDB = main\CMakeFiles\program.dir\
   TARGET_PDB = main\program.pdb
 
+build main\CMakeFiles\program.dir\__\src\stack.cc.obj: CXX_COMPILER__program_Debug ..\..\..\src\stack.cc || cmake_object_order_depends_target_program
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -O3 -Wall -std=c++11
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = main\CMakeFiles\program.dir
+  OBJECT_FILE_DIR = main\CMakeFiles\program.dir\__\src
+  TARGET_COMPILE_PDB = main\CMakeFiles\program.dir\
+  TARGET_PDB = main\program.pdb
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target program
@@ -119,7 +127,7 @@ build main\CMakeFiles\program.dir\__\src\heap.cc.obj: CXX_COMPILER__program_Debu
 #############################################
 # Link the executable main\program.exe
 
-build main\program.exe: CXX_EXECUTABLE_LINKER__program_Debug main\CMakeFiles\program.dir\main.cc.obj main\CMakeFiles\program.dir\__\src\backtrack.cc.obj main\CMakeFiles\program.dir\__\src\candidate_set.cc.obj main\CMakeFiles\program.dir\__\src\graph.cc.obj main\CMakeFiles\program.dir\__\src\heap.cc.obj
+build main\program.exe: CXX_EXECUTABLE_LINKER__program_Debug main\CMakeFiles\program.dir\main.cc.obj main\CMakeFiles\program.dir\__\src\backtrack.cc.obj main\CMakeFiles\program.dir\__\src\candidate_set.cc.obj main\CMakeFiles\program.dir\__\src\graph.cc.obj main\CMakeFiles\program.dir\__\src\heap.cc.obj main\CMakeFiles\program.dir\__\src\stack.cc.obj
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
   LINK_LIBRARIES = kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
