@@ -2,8 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\include",
+    "\\main",
     "\\src"
   ],
-  "SelectedNode": "\\src\\stack.cc",
+  "SelectedNode": "\\src\\backtrack.cc",
   "PreviewInSolutionExplorer": false
 }

@@ -7,3 +7,12 @@
 7	1017	6444039946151988	main/CMakeFiles/program.dir/__/src/candidate_set.cc.obj	7bd2769576655f76
 988	1306	6442281874711415	main/program.exe	a4f9a605dea6a406
 0	12	0	clean	9992afb1f91dc381
+0	12	0	clean	9992afb1f91dc381
+31	693	6444044090650752	main/CMakeFiles/program.dir/__/src/stack.cc.obj	3b48a4405db922d2
+8	706	6444044090760749	main/CMakeFiles/program.dir/main.cc.obj	4023c230376d18fa
+23	718	6444044090820740	main/CMakeFiles/program.dir/__/src/candidate_set.cc.obj	7bd2769576655f76
+40	720	6444044090760749	main/CMakeFiles/program.dir/__/src/heap.cc.obj	17b496da5cb8decc
+48	744	6444044091180750	main/CMakeFiles/program.dir/__/src/graph.cc.obj	e6ccf81c3bc07538
+1	749	6444044091220737	main/CMakeFiles/program.dir/__/src/backtrack.cc.obj	5c12121f3e7d6c2
+754	1026	6444044093210751	main/program.exe	a735ce1b9f7e0883
+0	16	0	clean	9992afb1f91dc381
