@@ -22,8 +22,8 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 
 
 	std::vector<size_t> pivotCS(num_query), posCS(num_query), num_matchedNeighbor(num_query, 1);
-	std::vector<long double> measure(num_query);
-	std::multimap<long double, Vertex> extendableVertex;
+	std::vector<float> measure(num_query);
+	std::multimap<float, Vertex> extendableVertex;
 
 	std::vector<std::vector<std::pair<Vertex, Vertex>>> extendableCS(num_query);
 	for (Vertex w = 0; w < num_query; w++) {
@@ -33,11 +33,11 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 
 	Vertex u = 0, un, v = -1;
 	std::pair< Vertex, Vertex > tempCS;
-	std::pair< long double, Vertex > tempEV;
-	std::multimap<long double, Vertex>::iterator it;
-	std::pair<std::multimap<long double, Vertex>::iterator, std::multimap<long double, Vertex>::iterator> range;
+	std::pair< float, Vertex > tempEV;
+	std::multimap<float, Vertex>::iterator it;
+	std::pair<std::multimap<float, Vertex>::iterator, std::multimap<float, Vertex>::iterator> range;
 
-	for (Vertex w = 0; w < num_query; w++) extendableVertex.insert(std::pair<long double, Vertex>(measure[w] = ((long double)cs.GetCandidateSize(w)) , w));;
+	for (Vertex w = 0; w < num_query; w++) extendableVertex.insert(std::pair<float, Vertex>(measure[w] = ((float)cs.GetCandidateSize(w)), w));;
 
 	bool call = true; //Store whether the function is examining new vertex or backtracking
 	bool matched;
@@ -80,7 +80,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 					for (it = range.first; it != range.second; it++) if (it->second == un) break;;
 					tempEV = *it;
 					extendableVertex.erase(it);
-					tempEV.first = measure[un] = ((long double)(cs.GetCandidateSize(un) - pivotCS[un])) / (num_matchedNeighbor[un] );
+					tempEV.first = measure[un] = ((float)(cs.GetCandidateSize(un) - pivotCS[un])) / (num_matchedNeighbor[un]);
 
 					extendableVertex.insert(tempEV);
 				}
@@ -91,7 +91,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 		while ((posCS[u] < cs.GetCandidateSize(u)) && data_mapped[v = extendableCS[u][posCS[u]].first]) posCS[u]++;
 
 		if (posCS[u] == cs.GetCandidateSize(u)) {
-			extendableVertex.insert(std::pair<long double, Vertex>(measure[u] = ((long double)(cs.GetCandidateSize(u) - pivotCS[u])) / (num_matchedNeighbor[u] ), u));
+			extendableVertex.insert(std::pair<float, Vertex>(measure[u] = ((float)(cs.GetCandidateSize(u) - pivotCS[u])) / (num_matchedNeighbor[u]), u));
 
 			state.pop();
 			query_mapped[u] = false;
@@ -129,7 +129,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 					for (it = range.first; it != range.second; it++) if (it->second == un) break;;
 					tempEV = *it;
 					extendableVertex.erase(it);
-					tempEV.first = measure[un] = ((long double)(cs.GetCandidateSize(un) - pivotCS[un])) / (num_matchedNeighbor[un] );
+					tempEV.first = measure[un] = ((float)(cs.GetCandidateSize(un) - pivotCS[un])) / (num_matchedNeighbor[un]);
 
 					extendableVertex.insert(tempEV);
 				}
