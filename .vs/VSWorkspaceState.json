@@ -1,13 +1,10 @@
 {
   "ExpandedNodes": [
     "",
-    "\\cs",
-    "\\data",
     "\\include",
     "\\main",
-    "\\out",
-    "\\query",
     "\\src"
   ],
+  "SelectedNode": "\\include\\graph.h",
   "PreviewInSolutionExplorer": false
 }

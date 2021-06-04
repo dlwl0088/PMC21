@@ -4,8 +4,8 @@
  */
 
 #include "backtrack.h"
-#include "stack.h"
 #include <map>
+#include <stack>
 
 Backtrack::Backtrack() {}
 Backtrack::~Backtrack() {}
@@ -18,7 +18,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 
 	std::vector<Vertex> embedding(num_query, -1);
 	std::vector<bool> query_mapped(num_query, false), data_mapped(num_data, false), Is_extendableVertex(num_query, false);
-	Stack state(num_query); //Store recurrence state
+	std::stack<Vertex> state; //Store recurrence state
 
 	std::vector<size_t> measure(num_query), pivotCS(num_query), posCS(num_query), num_matchedNeighbor(num_query);
 	std::multimap<size_t, Vertex> extendableVertex;
@@ -26,9 +26,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 	std::vector<std::vector<std::pair<Vertex, Vertex>>> extendableCS(num_query);
 	for (Vertex w = 0; w < num_query; w++) {
 		extendableCS[w].resize(cs.GetCandidateSize(w));
-		for (size_t i = 0; i < cs.GetCandidateSize(w); i++) {
-			extendableCS[w][i] = std::pair<Vertex, Vertex>(cs.GetCandidate(w, i), -1);
-		}
+		for (size_t i = 0; i < cs.GetCandidateSize(w); i++) extendableCS[w][i] = std::pair<Vertex, Vertex>(cs.GetCandidate(w, i), -1);
 	}
 
 	Vertex u = 0, un, v = -1;
@@ -38,12 +36,12 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 	std::pair<std::multimap<size_t, Vertex>::iterator, std::multimap<size_t, Vertex>::iterator> range;
 
 	// Selecting root vertex
-	size_t argmax = cs.GetCandidateSize(0) * query.GetDegree(0), argtemp;
+	long double argmin = ((long double)cs.GetCandidateSize(0)) / query.GetDegree(0), argtemp;
 	for (size_t i = 1; i < num_query; i++) {
-		argtemp = cs.GetCandidateSize(i) * query.GetDegree(i);
-		if (argtemp > argmax) {
+		argtemp = ((long double)cs.GetCandidateSize(i)) / query.GetDegree(i);
+		if (argtemp < argmin) {
 			u = i;
-			argmax = argtemp;
+			argmin = argtemp;
 		}
 	}
 
@@ -66,7 +64,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 
 		}
 		else {
-			u = state.peek();
+			u = state.top();
 			data_mapped[extendableCS[u][posCS[u]].first] = false;
 			query_mapped[u] = false;
 			embedding[u] = -1;
@@ -99,7 +97,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 						Is_extendableVertex[un] = true;
 					}
 
-					measure[un] = (pivotCS[un]+1) * num_matchedNeighbor[un];
+					measure[un] = (pivotCS[un] + 1) * num_matchedNeighbor[un];
 					extendableVertex.insert(std::pair<size_t, Vertex>(measure[un], un));
 				}
 			}
@@ -109,7 +107,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 		while ((posCS[u] < cs.GetCandidateSize(u)) && data_mapped[v = extendableCS[u][posCS[u]].first]) posCS[u]++;
 
 		if (posCS[u] == cs.GetCandidateSize(u)) {
-			measure[u] = (pivotCS[u]+1) * num_matchedNeighbor[u];
+			measure[u] = (pivotCS[u] + 1) * num_matchedNeighbor[u];
 			extendableVertex.insert(std::pair<size_t, Vertex>(measure[u], u));
 			Is_extendableVertex[u] = true;
 
@@ -153,7 +151,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 						Is_extendableVertex[un] = true;
 					}
 
-					measure[un] = (pivotCS[un]+1 )* num_matchedNeighbor[un];
+					measure[un] = (pivotCS[un] + 1) * num_matchedNeighbor[un];
 					extendableVertex.insert(std::pair<size_t, Vertex>(measure[un], un));
 				}
 			}
