@@ -37,8 +37,8 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 	std::multimap<long double, Vertex>::iterator it;
 	std::pair<std::multimap<long double, Vertex>::iterator, std::multimap<long double, Vertex>::iterator> range;
 
-	for (Vertex w = 0; w < num_query; w++) extendableVertex.insert(std::pair<long double, Vertex>(measure[w] = ((long double)cs.GetCandidateSize(w)) / query.GetDegree(w), w));;
-	
+	for (Vertex w = 0; w < num_query; w++) extendableVertex.insert(std::pair<long double, Vertex>(measure[w] = ((long double)cs.GetCandidateSize(w)) , w));;
+
 	bool call = true; //Store whether the function is examining new vertex or backtracking
 	bool matched;
 	std::vector<size_t> stoppedNeighborOffset(num_query);
@@ -80,7 +80,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 					for (it = range.first; it != range.second; it++) if (it->second == un) break;;
 					tempEV = *it;
 					extendableVertex.erase(it);
-					tempEV.first = measure[un] = ((long double)(cs.GetCandidateSize(un) - pivotCS[un])) / (num_matchedNeighbor[un] * query.GetDegree(un));
+					tempEV.first = measure[un] = ((long double)(cs.GetCandidateSize(un) - pivotCS[un])) / (num_matchedNeighbor[un] );
 
 					extendableVertex.insert(tempEV);
 				}
@@ -90,8 +90,8 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 
 		while ((posCS[u] < cs.GetCandidateSize(u)) && data_mapped[v = extendableCS[u][posCS[u]].first]) posCS[u]++;
 
-		if (posCS[u] == cs.GetCandidateSize(u)) {			
-			extendableVertex.insert(std::pair<long double, Vertex>(measure[u]= ((long double)(cs.GetCandidateSize(u) - pivotCS[u])) / (num_matchedNeighbor[u] * query.GetDegree(u)), u));
+		if (posCS[u] == cs.GetCandidateSize(u)) {
+			extendableVertex.insert(std::pair<long double, Vertex>(measure[u] = ((long double)(cs.GetCandidateSize(u) - pivotCS[u])) / (num_matchedNeighbor[u] ), u));
 
 			state.pop();
 			query_mapped[u] = false;
@@ -129,7 +129,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 					for (it = range.first; it != range.second; it++) if (it->second == un) break;;
 					tempEV = *it;
 					extendableVertex.erase(it);
-					tempEV.first = measure[un] = ((long double)(cs.GetCandidateSize(un) - pivotCS[un])) / (num_matchedNeighbor[un] * query.GetDegree(un));
+					tempEV.first = measure[un] = ((long double)(cs.GetCandidateSize(un) - pivotCS[un])) / (num_matchedNeighbor[un] );
 
 					extendableVertex.insert(tempEV);
 				}
