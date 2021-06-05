@@ -2,11 +2,8 @@
 ## Compile and Execute 
 ### main program
 ```
-mkdir build
-cd build
-cmake ..
-make
-./main/program <data graph file> <query graph file> <candidate set file>
+sh build.sh
+sh test.sh
 ```
 ### executable program that outputs a candidate set
 ```
