@@ -45,12 +45,12 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 	std::pair<std::multimap<size_t, Vertex>::iterator, std::multimap<size_t, Vertex>::iterator> rangeL;
 
 	for (Vertex w = 0; w < num_Vq; w++) {
-		ExVertex.insert(std::pair<float, Vertex>(key[w] = ((float)cs.GetCandidateSize(w) / pow(query.GetDegree(w), exp)), w));
-		ExVertexList.insert(std::pair<size_t, Vertex>(num_CS[w] = (cs.GetCandidateSize(w)), w));
+		ExVertex.insert(std::pair<float, Vertex>(key[w] = (float)cs.GetCandidateSize(w) / pow(query.GetDegree(w), exp), w));
+		ExVertexList.insert(std::pair<size_t, Vertex>(num_CS[w] = cs.GetCandidateSize(w), w));
 	}
 
 	bool call = true; //Store whether the function is examining new vertex or backtracking
-	bool matched;
+	bool matched, ExCan_Exists;
 	std::vector<size_t> stoppedNeighborOffset(num_Vq);
 
 	do {
@@ -112,8 +112,19 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 
 		while ((posCS[u] < cs.GetCandidateSize(u)) && VG_mapped[v = ExCan[u][posCS[u]].first]) posCS[u]++;
 
-		if (posCS[u] == cs.GetCandidateSize(u)) {
-			ExVertex.insert(std::pair<float, Vertex>(key[u] = ((float)(cs.GetCandidateSize(u) - pivotCS[u])) / (num_parent[u] * pow(query.GetDegree(u), exp)), u));
+		ExCan_Exists = (posCS[u] != cs.GetCandidateSize(u));
+		if (ExCan_Exists) {
+			rangeL = ExVertexList.equal_range(1);
+			for (itL = rangeL.first; itL != rangeL.second; itL++) {
+				if (ExCan[itL->second][pivotCS[itL->second]].first == v) {
+					ExCan_Exists = false;
+					break;
+				}
+			}
+		}
+
+		if (!ExCan_Exists) {
+			ExVertex.insert(std::pair<float, Vertex>(key[u] = (float)(cs.GetCandidateSize(u) - pivotCS[u]) / (num_parent[u] * pow(query.GetDegree(u), exp)), u));
 			ExVertexList.insert(std::pair<size_t, Vertex>(num_CS[u] = cs.GetCandidateSize(u) - pivotCS[u], u));
 
 			state.pop();
@@ -123,25 +134,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 			continue;
 		}
 
-		bool duplicate = false;
-		rangeL = ExVertexList.equal_range(1);
-		for (itL = rangeL.first; itL != rangeL.second; itL++) {
-			if (ExCan[itL->second][pivotCS[itL->second]].first == v) duplicate = true;
-		}
-		if (duplicate) {
-			ExVertex.insert(std::pair<float, Vertex>(key[u] = ((float)(cs.GetCandidateSize(u) - pivotCS[u])) / (num_parent[u] * pow(query.GetDegree(u), exp)), u));
-			ExVertexList.insert(std::pair<size_t, Vertex>(num_CS[u] = cs.GetCandidateSize(u) - pivotCS[u], u));
-
-			state.pop();
-			Vq_mapped[u] = false;
-
-			call = false;
-			continue;
-		}
 		matched = true;
-
-
-
 		stoppedNeighborOffset[u] = query.GetNeighborEndOffset(u);
 		for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
 			un = query.GetNeighbor(k);
@@ -170,7 +163,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 					for (it = range.first; it != range.second; it++) if (it->second == un) break;;
 					tempEV = *it;
 					ExVertex.erase(it);
-					tempEV.first = key[un] = ((float)(cs.GetCandidateSize(un) - pivotCS[un])) / (num_parent[un] * pow(query.GetDegree(un), exp));
+					tempEV.first = key[un] = (float)(cs.GetCandidateSize(un) - pivotCS[un]) / (num_parent[un] * pow(query.GetDegree(un), exp));
 
 					ExVertex.insert(tempEV);
 
@@ -189,7 +182,6 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 			call = false;
 			continue;
 		}
-
 
 		embedding[u] = v;
 		VG_mapped[v] = true;

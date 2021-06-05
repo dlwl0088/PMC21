@@ -1,10 +1,7 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\include",
-    "\\main",
-    "\\src"
+    ""
   ],
-  "SelectedNode": "\\build.sh",
+  "SelectedNode": "\\query",
   "PreviewInSolutionExplorer": false
 }
