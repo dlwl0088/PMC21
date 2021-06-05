@@ -1,6 +1,5 @@
 # Graph Pattern Matching Challenge
 ## Compile and Execute 
-### main program
 ```
 sh build.sh
 sh test.sh
