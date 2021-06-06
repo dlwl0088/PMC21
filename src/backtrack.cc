@@ -13,6 +13,8 @@ Backtrack::~Backtrack() {}
 
 void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 	const CandidateSet& cs) {
+	
+	size_t i, k; //iterator
 
 	size_t num_Vq = query.GetNumVertices(), num_VG = data.GetNumVertices();
 	std::cout << "t " << num_Vq << "\n";
@@ -32,7 +34,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 	std::vector<std::vector<std::pair<Vertex, Vertex>>> ExCan(num_Vq);//Extendable Candidates
 	for (Vertex w = 0; w < num_Vq; w++) {
 		ExCan[w].resize(cs.GetCandidateSize(w));
-		for (size_t i = 0; i < cs.GetCandidateSize(w); i++) ExCan[w][i] = std::pair<Vertex, Vertex>(cs.GetCandidate(w, i), -1);
+		for (i = 0; i < cs.GetCandidateSize(w); i++) ExCan[w][i] = std::pair<Vertex, Vertex>(cs.GetCandidate(w, i), -1);
 	}
 
 	Vertex u = 0, un, v = -1;
@@ -72,13 +74,13 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 			VG_mapped[ExCan[u][posCS[u]].first] = false;
 			embedding[u] = -1;
 
-			for (size_t k = query.GetNeighborStartOffset(u); k < stoppedNeighborOffset[u]; k++) {
+			for (k = query.GetNeighborStartOffset(u); k < stoppedNeighborOffset[u]; k++) {
 				un = query.GetNeighbor(k);
 
 				if (!Vq_mapped[un]) {
 					num_parent[un]--;
 
-					size_t i = pivotCS[un];
+					i = pivotCS[un];
 					while (i > 0) {
 						--i;
 						if (ExCan[un][i].second != u) {
@@ -136,12 +138,12 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 
 		matched = true;
 		stoppedNeighborOffset[u] = query.GetNeighborEndOffset(u);
-		for (size_t k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
+		for (k = query.GetNeighborStartOffset(u); k < query.GetNeighborEndOffset(u); k++) {
 			un = query.GetNeighbor(k);
 
 			if (!Vq_mapped[un]) {
 				num_parent[un]++;
-				for (size_t i = pivotCS[un]; i < cs.GetCandidateSize(un); i++) {
+				for (i = pivotCS[un]; i < cs.GetCandidateSize(un); i++) {
 					if (!data.IsNeighbor(v, ExCan[un][i].first)) {
 						ExCan[un][i].second = u;
 
@@ -188,7 +190,7 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 
 		if (state.size() == num_Vq) {
 			std::cout << "a";
-			for (size_t i = 0; i < num_Vq; i++) {
+			for (i = 0; i < num_Vq; i++) {
 				std::cout << " " << embedding[i];
 			}
 			std::cout << "\n";
