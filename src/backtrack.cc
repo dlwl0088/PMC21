@@ -24,7 +24,8 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 	std::stack<Vertex> state; //Store recurrence state
 
 	float exp = 0.75;
-
+	size_t ans=0,cap=100000;
+	
 	std::vector<size_t> pivotCS(num_Vq), posCS(num_Vq), num_parent(num_Vq, 1);
 	std::vector<float> key(num_Vq);
 	std::vector<size_t> num_CS(num_Vq);
@@ -194,6 +195,8 @@ void Backtrack::PrintAllMatches(const Graph& data, const Graph& query,
 				std::cout << " " << embedding[i];
 			}
 			std::cout << "\n";
+			ans++;
+			if (ans==cap) return;
 			call = false;
 		}
 		else {
